@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreestyleHelper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>FreestyleHelper</h1>
+        <p>Generate song structures for freestyle rap practice</p>
+    </header>
+
+    <main>
+        <div class="controls">
+            <div class="language-selector">
+                <label>
+                    <input type="radio" name="language" value="en" checked> English
+                </label>
+                <label>
+                    <input type="radio" name="language" value="sv"> Swedish
+                </label>
+            </div>
+            <button id="generate-btn">Generate Song</button>
+        </div>
+
+        <div id="song-output" class="output-container">
+            <!-- Generated song content will appear here -->
+            <p class="placeholder-message">Click "Generate Song" to create a song structure</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>FreestyleHelper &copy; 2025</p>
+    </footer>
+
+    <script src="client.js"></script>
+</body>
+
+</html>

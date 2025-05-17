@@ -1,0 +1,117 @@
+/* FreestyleHelper Styles */
+
+/* Base Styles */
+:root {
+    --primary-color: #2d2d2d;
+    --secondary-color: #333;
+    --accent-color: #4c8bf5;
+    --text-color: #f0f0f0;
+    --border-radius: 4px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px 0;
+    border-bottom: 1px solid #444;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+/* Controls */
+.controls {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.language-selector {
+    display: flex;
+    gap: 15px;
+}
+
+.language-selector label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #3a7ce2;
+}
+
+/* Output Container */
+.output-container {
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    min-height: 300px;
+}
+
+.placeholder-message {
+    text-align: center;
+    color: #888;
+    margin-top: 100px;
+}
+
+/* Footer */
+footer {
+    margin-top: 30px;
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .language-selector {
+        width: 100%;
+        justify-content: center;
+    }
+
+    button {
+        width: 100%;
+    }
+}
