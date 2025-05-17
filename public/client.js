@@ -21,10 +21,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       // Call the API
-      const response = await fetch(`/api/generate_song?lang=${selectedLanguage}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to generate song');
+      // Try first with /api prefix (for local development), then without (for Vercel)
+      let response;
+      try {
+        response = await fetch(`/api/generate_song?lang=${selectedLanguage}`);
+        if (!response.ok) {
+          // If the /api route fails, try the direct route (for Vercel serverless functions)
+          const altResponse = await fetch(`/generate_song?lang=${selectedLanguage}`);
+          if (altResponse.ok) {
+            response = altResponse;
+          } else {
+            throw new Error('Failed to generate song');
+          }
+        }
+      } catch (error) {
+        // Try alternative route if first attempt fails
+        try {
+          response = await fetch(`/generate_song?lang=${selectedLanguage}`);
+          if (!response.ok) {
+            throw new Error('Failed to generate song');
+          }
+        } catch (secondError) {
+          throw new Error('Failed to generate song');
+        }
       }
 
       const data = await response.json();
