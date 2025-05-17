@@ -122,11 +122,8 @@
 2.  **Error Handling & Fallbacks:**
       * Enhance error handling for `axios` requests (timeouts, network errors).
       * Implement logic for what happens if `rimlexikon.se`'s structure changes and the selector `'ol.word-list li'` fails. Could involve logging the error and returning an empty array or a "service temporarily unavailable" message for Swedish rhymes.
-3.  **Cache Optimization:**
-      * Review the in-memory cache. For Vercel serverless functions, consider if the cache lifespan is appropriate or if an external caching layer (e.g., Vercel KV, Upstash Redis) would be beneficial for higher traffic (likely overkill for an initial version). Stick with in-memory for simplicity first.
-4.  **Responsible Scraping Review:**
+3.  **Responsible Scraping Review:**
       * Ensure the User-Agent is set.
-      * Confirm that caching is effectively minimizing direct hits to `rimlexikon.se`. The `robots.txt` allows crawling, but responsible use is key.
 
 **Phase 5: Comprehensive Testing & Refinement**
 

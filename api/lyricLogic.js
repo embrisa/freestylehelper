@@ -244,44 +244,73 @@ const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
  * @returns {Object} Object containing the word and an array of rhyming words
  */
 async function getSwedishRhymes(word, limit = 10) {
+    // Normalize the word (lowercase, trim spaces)
+    const normalizedWord = word.toLowerCase().trim();
+
     try {
-        // Check cache first
-        if (swedishRhymeCache.has(word)) {
-            const cachedItem = swedishRhymeCache.get(word);
+        // Check cache first to reduce load on rimlexikon.se
+        if (swedishRhymeCache.has(normalizedWord)) {
+            const cachedItem = swedishRhymeCache.get(normalizedWord);
             // Check if cache is still valid
             if (Date.now() - cachedItem.timestamp < CACHE_EXPIRY) {
                 return {
-                    word,
+                    word: normalizedWord,
                     rhymes: cachedItem.rhymes.slice(0, limit),
                     source: 'cache'
                 };
             } else {
                 // Cache expired, remove it
-                swedishRhymeCache.delete(word);
+                swedishRhymeCache.delete(normalizedWord);
             }
         }
 
         // Construct URL for rimlexikon.se
-        const targetUrl = `https://www.rimlexikon.se/ord/${encodeURIComponent(word)}`;
+        const targetUrl = `https://www.rimlexikon.se/ord/${encodeURIComponent(normalizedWord)}`;
 
-        // Fetch HTML with a proper User-Agent
+        // Fetch HTML with a proper User-Agent to identify our application
+        // This is considered good practice and more ethical/responsible scraping
         const response = await axios.get(targetUrl, {
             headers: {
-                'User-Agent': 'FreestyleHelper/1.0 (educational project)'
-            }
+                'User-Agent': 'FreestyleHelper/1.0 (https://freestylehelper.vercel.app)',
+                'Accept': 'text/html',
+                'Accept-Language': 'sv,en;q=0.9'
+            },
+            timeout: 5000 // 5 second timeout to prevent hanging requests
         });
 
         // Parse HTML with cheerio
         const $ = cheerio.load(response.data);
 
-        // Extract rhymes from word list
+        // Extract rhymes from word list - using a more robust selector pattern
+        // First try the expected selector
+        let rhymeElements = $('ol.word-list li');
+
+        // If primary selector fails, try fallback selectors
+        if (rhymeElements.length === 0) {
+            // Try alternative selectors that might exist if site structure changes
+            rhymeElements = $('ul.word-list li, div.rhymes li, .rhyme-list li');
+
+            // If still no rhymes found with fallback selectors
+            if (rhymeElements.length === 0) {
+                // Last resort: try to find any list items that might contain rhymes
+                rhymeElements = $('ol li, ul li').filter(function () {
+                    // Simple heuristic: list items in the main content area
+                    return $(this).parents('nav, header, footer').length === 0;
+                });
+            }
+        }
+
+        // Extract rhymes
         const rhymes = [];
-        $('ol.word-list li').each((index, element) => {
-            rhymes.push($(element).text().trim());
+        rhymeElements.each((index, element) => {
+            const rhymeText = $(element).text().trim();
+            if (rhymeText && rhymeText !== normalizedWord) {
+                rhymes.push(rhymeText);
+            }
         });
 
         // Cache the results
-        swedishRhymeCache.set(word, {
+        swedishRhymeCache.set(normalizedWord, {
             rhymes,
             timestamp: Date.now()
         });
@@ -289,32 +318,60 @@ async function getSwedishRhymes(word, limit = 10) {
         // If no rhymes found, handle gracefully
         if (rhymes.length === 0) {
             return {
-                word,
+                word: normalizedWord,
                 rhymes: [],
                 note: "Inga rim hittades för detta ord." // "No rhymes found for this word" in Swedish
             };
         }
 
         return {
-            word,
+            word: normalizedWord,
             rhymes: rhymes.slice(0, limit)
         };
     } catch (error) {
-        console.error(`Error fetching Swedish rhymes for "${word}":`, error.message);
+        console.error(`Error fetching Swedish rhymes for "${normalizedWord}":`, error.message);
 
-        // Check if it's a 404 error (word not found)
-        if (error.response && error.response.status === 404) {
+        // More comprehensive error handling with specific messages
+        if (error.code === 'ECONNABORTED') {
             return {
-                word,
+                word: normalizedWord,
                 rhymes: [],
-                note: "Ordet hittades inte i rimlexikon." // "The word was not found in the rhyme dictionary" in Swedish
+                note: "Timeout vid anslutning till rimordbok." // "Timeout connecting to rhyme dictionary" in Swedish
             };
+        } else if (error.code === 'ENOTFOUND' || error.code === 'ETIMEDOUT') {
+            return {
+                word: normalizedWord,
+                rhymes: [],
+                note: "Kunde inte ansluta till rimordbok. Kontrollera din internetanslutning." // "Could not connect to rhyme dictionary. Check your internet connection." in Swedish
+            };
+        } else if (error.response) {
+            // Handle specific HTTP error responses
+            if (error.response.status === 404) {
+                return {
+                    word: normalizedWord,
+                    rhymes: [],
+                    note: "Ordet hittades inte i rimlexikon." // "The word was not found in the rhyme dictionary" in Swedish
+                };
+            } else if (error.response.status === 429) {
+                return {
+                    word: normalizedWord,
+                    rhymes: [],
+                    note: "För många förfrågningar till rimordboken. Vänta en stund och försök igen." // "Too many requests to the rhyme dictionary. Wait a moment and try again." in Swedish
+                };
+            } else if (error.response.status >= 500) {
+                return {
+                    word: normalizedWord,
+                    rhymes: [],
+                    note: "Rimordboken är tillfälligt otillgänglig. Försök igen senare." // "The rhyme dictionary is temporarily unavailable. Try again later." in Swedish
+                };
+            }
         }
 
+        // Generic fallback for any other errors
         return {
-            word,
+            word: normalizedWord,
             rhymes: [],
-            error: "Kunde inte hämta rim" // "Failed to fetch rhymes" in Swedish
+            note: "Kunde inte hämta rim. Försök igen senare." // "Could not fetch rhymes. Try again later." in Swedish
         };
     }
 }
