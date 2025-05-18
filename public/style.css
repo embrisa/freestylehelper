@@ -12,6 +12,8 @@
     --line-height: 36px;
     --shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     --transition: all 0.3s ease;
+    --success-color: #4caf50;
+    --error-color: #ff5252;
 }
 
 * {
@@ -175,6 +177,35 @@ button:active {
     background-clip: text;
     color: transparent;
     letter-spacing: 1px;
+}
+
+/* Copy Button Styles */
+.copy-song-btn {
+    display: block;
+    margin: 0 auto 20px;
+    background: linear-gradient(45deg, var(--accent-color), var(--accent-secondary));
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(93, 125, 232, 0.3);
+}
+
+.copy-song-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 232, 0.4);
+}
+
+.copy-song-btn.copied {
+    background: linear-gradient(45deg, var(--success-color), var(--success-color));
+}
+
+.copy-song-btn.error {
+    background: linear-gradient(45deg, var(--error-color), var(--error-color));
 }
 
 .song-part {
@@ -362,6 +393,38 @@ button:active {
             rgba(157, 125, 232, 0.2) 20px);
     background-size: 28px 28px;
     animation: movingStripes 30s linear infinite;
+    z-index: 1;
+}
+
+.lyric-text {
+    position: relative;
+    min-height: 30px;
+    width: 100%;
+    padding: 5px 10px;
+    color: var(--text-color);
+    font-size: 1rem;
+    z-index: 2;
+    outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: var(--transition);
+}
+
+.lyric-text:focus {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.lyric-text.active {
+    font-weight: 500;
+}
+
+.lyric-text[placeholder]:empty:before {
+    content: attr(placeholder);
+    color: var(--text-secondary);
+    opacity: 0.6;
+    font-style: italic;
+    font-size: 0.9em;
 }
 
 @keyframes movingStripes {
@@ -420,6 +483,34 @@ button:active {
     background-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
     cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.rhyme-word:active {
+    transform: translateY(0);
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.rhyme-word.selected {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(93, 125, 232, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 5px rgba(93, 125, 232, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(93, 125, 232, 0);
+    }
 }
 
 .rhyme-note {
@@ -493,6 +584,11 @@ footer {
     .part-header {
         font-size: 1.3rem;
     }
+
+    .copy-song-btn {
+        width: 90%;
+        margin: 0 auto 20px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -532,6 +628,11 @@ footer {
         margin-right: 0;
     }
 
+    .lyric-text {
+        padding: 8px;
+        width: 100%;
+    }
+
     .rhyme-suggestions {
         width: 100%;
         margin-left: 0;
@@ -545,7 +646,17 @@ footer {
         max-width: 100%;
     }
 
+    .rhyme-word {
+        padding: 6px 12px;
+        font-size: 1rem;
+    }
+
     .song-part {
         padding: 15px;
+    }
+
+    .copy-song-btn {
+        width: 100%;
+        padding: 10px;
     }
 }
