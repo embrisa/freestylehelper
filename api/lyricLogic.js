@@ -104,6 +104,27 @@ function getRhymeSchemes() {
                 return scheme.slice(0, lineCount);
             }
         },
+        {
+            name: "ABAB",
+            description: "Simple Alternating",
+            generator: (lineCount) => {
+                const scheme = [];
+                let currentChar = 'A';
+
+                for (let i = 0; i < lineCount; i += 4) {
+                    // Add ABAB pattern
+                    scheme.push(currentChar); // A
+                    scheme.push(String.fromCharCode(currentChar.charCodeAt(0) + 1)); // B
+                    scheme.push(currentChar); // A
+                    scheme.push(String.fromCharCode(currentChar.charCodeAt(0) + 1)); // B
+
+                    // Move to next pair of letters (A,B -> C,D -> E,F etc)
+                    currentChar = String.fromCharCode(currentChar.charCodeAt(0) + 2);
+                }
+
+                return scheme.slice(0, lineCount);
+            }
+        }
     ];
 }
 
