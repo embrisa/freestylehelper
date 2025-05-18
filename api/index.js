@@ -4,7 +4,8 @@ const {
     generateSongStructure,
     generateRhymeScheme,
     getEnglishRhymes,
-    getSwedishRhymes
+    getSwedishRhymes,
+    getRandomSeedWord
 } = require('./lyricLogic');
 
 // Create Express app
@@ -45,17 +46,12 @@ app.get('/api/generate_song', async (req, res) => {
             // 4. Find unique rhyme groups (A, B, C, etc.)
             const uniqueRhymeGroups = [...new Set(rhymeScheme.scheme)];
 
-            // 5. Generate seed words for each unique rhyme group
-            const seedWords = lang === 'en'
-                ? ['time', 'way', 'day', 'man', 'thing', 'world']
-                : ['tid', 'sätt', 'dag', 'man', 'sak', 'värld'];
-
-            // 6. Get rhyming words for each unique rhyme group
+            // 5. Get rhyming words for each unique rhyme group
             const rhymeDictionary = {};
 
             for (const rhymeGroup of uniqueRhymeGroups) {
-                // Select a random seed word
-                const seedWord = seedWords[Math.floor(Math.random() * seedWords.length)];
+                // Get a random seed word for this language
+                const seedWord = getRandomSeedWord(lang);
 
                 // Get rhymes based on language
                 const rhymeResult = lang === 'en'
