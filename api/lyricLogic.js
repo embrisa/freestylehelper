@@ -104,65 +104,6 @@ function getRhymeSchemes() {
                 return scheme.slice(0, lineCount);
             }
         },
-        {
-            name: "ABAB",
-            description: "Alternating rhymes",
-            generator: (lineCount) => {
-                const scheme = [];
-
-                for (let i = 0; i < lineCount; i += 4) {
-                    scheme.push('A', 'B', 'A', 'B');
-                }
-
-                return scheme.slice(0, lineCount);
-            }
-        },
-        {
-            name: "AAAA",
-            description: "Same rhyme throughout",
-            generator: (lineCount) => Array(lineCount).fill('A')
-        },
-        {
-            name: "AABBCCDD",
-            description: "Sequential paired rhymes",
-            generator: (lineCount) => {
-                const scheme = [];
-                let currentChar = 'A';
-
-                for (let i = 0; i < lineCount; i += 2) {
-                    // Each pair of lines gets the same rhyme character
-                    scheme.push(currentChar, currentChar);
-
-                    // Move to next letter (A → B → C, etc.)
-                    currentChar = String.fromCharCode(currentChar.charCodeAt(0) + 1);
-                }
-
-                return scheme.slice(0, lineCount);
-            }
-        },
-        {
-            name: "Freestyle",
-            description: "Random mix of rhymes",
-            generator: (lineCount) => {
-                const scheme = [];
-                let availableChars = [];
-                let nextChar = 'A';
-
-                for (let i = 0; i < lineCount; i++) {
-                    // 40% chance of starting a new rhyme pattern
-                    if (Math.random() < 0.4 || availableChars.length === 0) {
-                        availableChars.push(nextChar);
-                        nextChar = String.fromCharCode(nextChar.charCodeAt(0) + 1);
-                    }
-
-                    // Randomly select from available rhyme characters
-                    const randomIndex = Math.floor(Math.random() * availableChars.length);
-                    scheme.push(availableChars[randomIndex]);
-                }
-
-                return scheme;
-            }
-        }
     ];
 }
 
